@@ -1,4 +1,5 @@
 from tkinter import *
+import os
 
 window = Tk()
 window.geometry("600x600")
@@ -9,6 +10,19 @@ main_frame.pack()
 
 filename = 'workouts.txt'
 workouts = []
+
+if os.path.exists(filename):
+    file = open(filename, 'r')
+
+    for line in file:
+        if line.find('!') == 0:
+            workouts.append([line[1:len(line) - 1]])
+        elif line.find('\n') != 0:
+            edited_line = line[0:len(line) - 1]
+            exercise_info = edited_line.split(',')
+            workouts[len(workouts) - 1].append(exercise_info)
+
+    file.close()
 
 def goToAddWorkout():
     exercises = []
@@ -74,6 +88,11 @@ def goToAddWorkout():
         if workout_name_entry.get() == '':
             valid_to_save = False
 
+        for workout in workouts:
+            if workout[0] == workout_name_entry:
+                valid_to_save = False
+                break
+
         if valid_to_save == True:
             for exercise in exercises:
                 exercise[0] = exercise[0].get()
@@ -86,7 +105,7 @@ def goToAddWorkout():
 
             for exercise in exercises:
                 if isinstance(exercise, str) == True:
-                    file.write(exercise + '\n')
+                    file.write('!' + exercise + '\n')
                 else:
                     file.write(exercise[0] + ',' + exercise[1] + ',' + exercise[2] + '\n')
 
@@ -119,10 +138,69 @@ workout_btns_frame.grid(row=0, column=0, sticky="N", pady=50)
 add_workout_btn = Button(master=workout_btns_frame, text='Add Workout', width=20, height=2, command=goToAddWorkout)
 add_workout_btn.grid(row=0, column=0)
 
-remove_workout_btn = Button(master=workout_btns_frame, text='Remove Workout', width=20, height=2)
+def remove_workout():
+    remove_workout_window = Tk()
+    remove_workout_window.title('Remove A Workout')
+    remove_workout_window.geometry("300x300")
+
+    remove_workout_frame = Frame(remove_workout_window)
+    remove_workout_frame.pack()
+
+    remove_workout_canvas = Canvas(remove_workout_frame)
+    remove_workout_canvas.pack(side=LEFT)
+
+    scrllBarBtns = Scrollbar(remove_workout_frame, orient='vertical', command=remove_workout_canvas.yview)
+    scrllBarBtns.pack(side='right', fill='y')
+
+    remove_workout_canvas.configure(yscrollcommand=scrllBarBtns.set)
+    remove_workout_canvas.bind('<Configure>', lambda e: remove_workout_canvas.configure(scrollregion=remove_workout_canvas.bbox('all')))
+
+    remove_workout_frame_2 = Frame(remove_workout_canvas)
+
+    remove_workout_canvas.create_window((0, 0), window=remove_workout_frame_2, anchor='nw')
+
+
+    for i in range(len(workouts)):
+        workout_name = Label(master=remove_workout_frame_2, text=workouts[i][0])
+        workout_name.grid(row=i, column=0)
+
+    remove_workout_name = Entry(master=remove_workout_frame_2, width=20)
+    remove_workout_name.grid(row=len(workouts), column=0, pady=5)
+
+    def delete_workout():
+        for i in range(len(workouts)):
+            if workouts[i][0] == remove_workout_name.get():
+                workouts.pop(i)
+                break
+
+        open(filename, 'w').close()
+
+        file = open(filename, 'a')
+
+        for workout in workouts:
+            for exercise in workout:
+                if isinstance(exercise, str) == True:
+                    file.write('!' + exercise + '\n')
+                else:
+                    file.write(exercise[0] + ',' + exercise[1] + ',' + exercise[2] + '\n')
+
+        if len(workouts) > 0:
+            file.write('\n')
+
+        file.close()
+
+        remove_workout_window.destroy()
+
+    remove_workout_btn = Button(master=remove_workout_frame_2, text='Remove', command=delete_workout)
+    remove_workout_btn.grid(row=len(workouts) + 1, column=0)
+
+    remove_workout_window.mainloop()
+
+
+remove_workout_btn = Button(master=workout_btns_frame, text='Remove Workout', width=20, height=2, command=remove_workout)
 remove_workout_btn.grid(row=1, column=0)
 
-modify_workout_btn = Button(master=workout_btns_frame, text='Modify Workout', width=20, height=2)
+modify_workout_btn = Button(master=workout_btns_frame, text='Complete Workout', width=20, height=2)
 modify_workout_btn.grid(row=2, column=0)
 
 history_workout_btn = Button(master=workout_btns_frame, text='History', width=20, height=2)
