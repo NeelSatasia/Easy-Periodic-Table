@@ -159,19 +159,8 @@ def remove_workout():
 
     remove_workout_canvas.create_window((0, 0), window=remove_workout_frame_2, anchor='nw')
 
-
-    for i in range(len(workouts)):
-        workout_name = Label(master=remove_workout_frame_2, text=workouts[i][0])
-        workout_name.grid(row=i, column=0)
-
-    remove_workout_name = Entry(master=remove_workout_frame_2, width=20)
-    remove_workout_name.grid(row=len(workouts), column=0, pady=5)
-
-    def delete_workout():
-        for i in range(len(workouts)):
-            if workouts[i][0] == remove_workout_name.get():
-                workouts.pop(i)
-                break
+    def rem_workout(num):
+        workouts.pop(num)
 
         open(filename, 'w').close()
 
@@ -191,8 +180,9 @@ def remove_workout():
 
         remove_workout_window.destroy()
 
-    remove_workout_btn = Button(master=remove_workout_frame_2, text='Remove', command=delete_workout)
-    remove_workout_btn.grid(row=len(workouts) + 1, column=0)
+    for index in range(len(workouts)):
+        workout_btn = Button(master=remove_workout_frame_2, text=workouts[index][0], command=lambda k=index: rem_workout(k))
+        workout_btn.pack(fill=BOTH, expand=True)
 
     remove_workout_window.mainloop()
 
@@ -200,8 +190,8 @@ def remove_workout():
 remove_workout_btn = Button(master=workout_btns_frame, text='Remove Workout', width=20, height=2, command=remove_workout)
 remove_workout_btn.grid(row=1, column=0)
 
-modify_workout_btn = Button(master=workout_btns_frame, text='Complete Workout', width=20, height=2)
-modify_workout_btn.grid(row=2, column=0)
+complete_workout_btn = Button(master=workout_btns_frame, text='Complete Workout', width=20, height=2)
+complete_workout_btn.grid(row=2, column=0)
 
 history_workout_btn = Button(master=workout_btns_frame, text='History', width=20, height=2)
 history_workout_btn.grid(row=3, column=0)
