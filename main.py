@@ -7,6 +7,7 @@ window.title('Workout Planner')
 main_frame = Frame(window)
 main_frame.pack()
 
+filename = 'workouts.txt'
 workouts = []
 
 def goToAddWorkout():
@@ -81,7 +82,20 @@ def goToAddWorkout():
 
             exercises.insert(0, workout_name_entry.get())
 
+            file = open(filename, 'a')
+
+            for exercise in exercises:
+                if isinstance(exercise, str) == True:
+                    file.write(exercise + '\n')
+                else:
+                    file.write(exercise[0] + ',' + exercise[1] + ',' + exercise[2] + '\n')
+
+            file.write('\n')
+
+            file.close()
+
             workouts.append(exercises)
+
             new_workout_window.destroy()
 
     save_workout_btn = Button(master=add_workout_frame_2, text='Save Workout', command=save_workout)
