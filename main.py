@@ -7,14 +7,19 @@ window.title('Workout Planner')
 main_frame = Frame(window)
 main_frame.pack()
 
+workouts = []
+
 def goToAddWorkout():
     exercises = []
 
-    add_workout_frame = Frame(main_frame)
-    add_workout_frame.grid(row=0, column=1, padx=10)
+    new_workout_window = Tk()
+    new_workout_window.title('New Workout')
+
+    add_workout_frame = Frame(new_workout_window)
+    add_workout_frame.pack()
 
     new_workout_canvas = Canvas(add_workout_frame)
-    new_workout_canvas.pack(side=LEFT, fill=BOTH, expand=1)
+    new_workout_canvas.pack(side=LEFT, fill = BOTH, expand=1)
 
     scrllBar = Scrollbar(add_workout_frame, orient='vertical', command=new_workout_canvas.yview)
     scrllBar.pack(side='right', fill='y')
@@ -42,13 +47,44 @@ def goToAddWorkout():
         sets_entry = Entry(master=add_workout_frame_2, width=5)
         sets_entry.grid(row=len(exercises) + 4, column=2, columnspan=1)
 
-        exercises.append([])
+        exercises.append([exercise_name_entry, reps_entry, sets_entry])
 
 
     add_exercise_btn = Button(master=add_workout_frame_2, text='Add Exercise', command=add_exercise)
     add_exercise_btn.grid(row=1, column=0, columnspan=3, pady=5)
 
-    save_workout_btn = Button(master=add_workout_frame_2, text='Save Workout')
+    def save_workout():
+
+        valid_to_save = True
+
+        for exercise in exercises:
+            if exercise[0].get() == '':
+                valid_to_save = False
+                break
+
+            if exercise[1].get() == '':
+                valid_to_save = False
+                break
+
+            if exercise[2].get() == '':
+                valid_to_save = False
+                break
+
+        if workout_name_entry.get() == '':
+            valid_to_save = False
+
+        if valid_to_save == True:
+            for exercise in exercises:
+                exercise[0] = exercise[0].get()
+                exercise[1] = exercise[1].get()
+                exercise[2] = exercise[2].get()
+
+            exercises.insert(0, workout_name_entry.get())
+
+            workouts.append(exercises)
+            new_workout_window.destroy()
+
+    save_workout_btn = Button(master=add_workout_frame_2, text='Save Workout', command=save_workout)
     save_workout_btn.grid(row=2, column=0, columnspan=3, pady=2)
 
     exercise_name = Label(master=add_workout_frame_2, text='Exercises')
@@ -59,6 +95,9 @@ def goToAddWorkout():
 
     sets = Label(master=add_workout_frame_2, text='Sets')
     sets.grid(row=3, column=2, columnspan=1)
+
+    new_workout_window.mainloop()
+
 
 workout_btns_frame = Frame(main_frame)
 workout_btns_frame.grid(row=0, column=0, sticky="N", pady=50)
